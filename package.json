@@ -10,7 +10,9 @@
     "express": "^4.17.1",
     "cors": "^2.8.5",
     "mongoose": "^5.9.5",
-    "mongoose-auto-increment-reworked": "^1.2.1"
+    "mongoose-auto-increment-reworked": "^1.2.1",
+    "nodemailer": "^6.4.5",
+    "nodemailer-smtp-transport": "^2.7.4"
   },
   "keywords": [],
   "author": "",

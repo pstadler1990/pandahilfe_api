@@ -1,7 +1,9 @@
 'use strict';
 
 const HelpEntry = require('./db/models/help_entry.js'),
-    Middleware = require('./db/middleware');
+    Middleware = require('./db/middleware'),
+    transporter = require('./mailer');
+const configMail = require("./config.mail");
 
 module.exports = function(server) {
 
@@ -92,11 +94,45 @@ module.exports = function(server) {
                 if(err)
                     res.status(400).json({'ok' : false, 'error' : 'api_error_entry_post_id'});
                 else {
-                    // TODO: Create email with user data from request
-                    // Email contains:
-                    // Name body.name
-                    // https://nodemailer.com/about/
-                    res.status(200).json({'ok' : true});
+                    if(entry['email']) {
+                        transporter.sendMail({
+                            from: configMail.sender,
+                            to: entry['email'],
+                            replyTo: body.email,
+                            subject: "Nachbarschaftshilfe PANDAHILFE - ANFRAGE",
+                            text: `Hallo liebe*r Helfer*in! Jemand, der deine Hilfe benötigt, hat dir eine Kontaktanfrage auf PANDAHILFE Regensburg gestellt.
+                            Hier sind seine / Ihre Kontaktdaten:
+                            ------------------------------------
+                            Name: ${body.name}
+                            E-Mail: ${body.email}
+                            Telefon: ${body.phone}
+                            -------------------------------------
+                            
+                            Es ging um deine Anzeige #${entry['entry_id']}: ${entry['tags']} in ${entry['location']}.
+                            Vielen Dank für deine Mithilfe!
+                            `,
+                            html: `<h3>Hallo liebe*r Helfer*in!</h3>
+                            <p>Jemand, der deine Hilfe benötigt, hat dir eine Kontaktanfrage auf PANDAHILFE Regensburg gestellt.</p>
+                            <p>Hier sind seine / Ihre Kontaktdaten:</p>
+                            <br />
+                            ------------------------------------<br />
+                            Name: ${body.name}<br />
+                            E-Mail: ${body.email}<br />
+                            Telefon: ${body.phone}<br />
+                            -------------------------------------<br />
+                            
+                            <p>Es ging um deine Anzeige #${entry['entry_id']}: ${entry['tags']} in ${entry['location']}</p>
+                         
+                            <h4>Vielen Dank für deine Mithilfe!</h4>
+                            `
+                        }).then(() => {
+                            res.status(200).json({'ok' : true});
+                        }).catch(() => {
+                            res.status(400).json({'ok' : false});
+                        });
+                    } else {
+                        res.status(400).json({'ok' : false, 'error' : 'api_error_entry_post_id'});
+                    }
                 }
             });
         } else {
@@ -116,13 +152,20 @@ module.exports = function(server) {
                     res.status(400).json({'ok' : false, 'error' : 'api_error_entry_delete_id'});
                 else {
                     if(entry) {
-                        // TODO: Create email with entry id
-                        // Email contains:
-                        // Name body.name
-                        // https://nodemailer.com/about/
+                        transporter.sendMail({
+                            from: 'pandahilfe-rgb@gmx.de',
+                            to: configMail.deleteReceivers,
+                            subject: "✗ Löschfrage PANDAHILFE ✗",
+                            text: `Bitte um Löschung der Anzeige ${entry['entry_id']} (Löschcode ${entry['deleteCode']})`,
+                        }).then(() => {
+                            res.status(200).json({'ok' : true});
+                        }).catch(() => {
+                            res.status(400).json({'ok' : false});
+                        });
+                    } else {
+                        /* Always respond with 200 OK even if the delete code was wrong*/
+                        res.status(200).json({'ok' : true});
                     }
-                    /* Always respond with 200 OK even if the delete code was wrong*/
-                    res.status(200).json({'ok' : true});
                 }
             });
         } else {
