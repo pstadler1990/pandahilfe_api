@@ -25,7 +25,7 @@ const helpEntrySchema = new mongoose.Schema({
         required: false
     },
     location: {
-        type: String,
+        type: [String],
         enum: config.locations,
         default: config.locations[0],
     },
