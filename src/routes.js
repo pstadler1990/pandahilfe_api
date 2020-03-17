@@ -77,6 +77,56 @@ module.exports = function(server) {
                 }
                 res.status(status).json(response);
             });
+        } else {
+            res.status(400).json({'ok' : false, 'error' : 'api_error_entry'});
+        }
+    });
+
+    server.post('/entry/:id', Middleware.ensureOrigin, function(req, res) {
+        /* Request for mail contact */
+        let body = req.body;
+        let entry_id = req.params.id;
+
+        if(body) {
+            HelpEntry.findOne({ 'entry_id': entry_id},  function(err, entry) {
+                if(err)
+                    res.status(400).json({'ok' : false, 'error' : 'api_error_entry_post_id'});
+                else {
+                    // TODO: Create email with user data from request
+                    // Email contains:
+                    // Name body.name
+                    // https://nodemailer.com/about/
+                    res.status(200).json({'ok' : true});
+                }
+            });
+        } else {
+            res.status(400).json({'ok' : false, 'error' : 'api_error_entry_post_id'});
+        }
+    });
+
+    server.delete('/entry/:id', Middleware.ensureOrigin, function(req, res) {
+        /* Request for mail (delete entry) */
+        let body = req.body;
+        let entry_id = req.params.id;
+        let deleteCode = body.code;
+
+        if(body && entry_id && deleteCode) {
+            HelpEntry.findOne({ 'entry_id': entry_id, 'deleteCode': deleteCode},  function(err, entry) {
+                if(err)
+                    res.status(400).json({'ok' : false, 'error' : 'api_error_entry_delete_id'});
+                else {
+                    if(entry) {
+                        // TODO: Create email with entry id
+                        // Email contains:
+                        // Name body.name
+                        // https://nodemailer.com/about/
+                    }
+                    /* Always respond with 200 OK even if the delete code was wrong*/
+                    res.status(200).json({'ok' : true});
+                }
+            });
+        } else {
+            res.status(400).json({'ok' : false, 'error' : 'api_error_entry_post_id'});
         }
     });
 
