@@ -1,5 +1,6 @@
 'use strict';
 
+const MongooseAutoIncrementID = require('mongoose-auto-increment-reworked').MongooseAutoIncrementID;
 const config = require('../../config');
 const helpers = require('../helpers');
 const mongoose = require('mongoose');
@@ -7,6 +8,10 @@ const mongoose = require('mongoose');
 const re = /\S+@\S+\.\S+/;
 
 const helpEntrySchema = new mongoose.Schema({
+    entry_id: {
+        type: Number,
+        default: 0
+    },
     name: {
         type: String,
         required: false
@@ -46,6 +51,17 @@ const helpEntrySchema = new mongoose.Schema({
     }
 }, { collection: 'help_entry' });
 
+const options = {
+    field: 'entry_id',
+    incrementBy: 1,
+    nextCount: false,
+    startAt: 100,
+    unique: true
+};
+
+const plugin = new MongooseAutoIncrementID(helpEntrySchema, 'HelpEntry', options);
+plugin.applyPlugin().then();
+
 /* Validation */
 helpEntrySchema.pre('save', function(next) {
     let entry = this;
@@ -53,7 +69,6 @@ helpEntrySchema.pre('save', function(next) {
     if(entry.email && re.test(entry.email)) {
         helpers.generateDeleteCode().then(code => {
             entry.deleteCode = code;
-            console.log('Created entry with delete code', code);
             next();
         });
     } else{

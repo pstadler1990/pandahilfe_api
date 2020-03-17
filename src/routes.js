@@ -7,7 +7,16 @@ module.exports = function(server) {
 
     server.get('/entry', Middleware.ensureOrigin, function(req, res) {
         /* List all entries */
-        const findQuery = {};
+        let findQuery = {};
+        if(req.query.location) {
+            findQuery = {'location': req.query.location};
+        }
+        if(req.query.tag) {
+            findQuery = {
+                ...findQuery,
+                'tags': req.query.tag
+            }
+        }
 
         HelpEntry.find(findQuery, function(err, entries) {
             if(err)
@@ -26,7 +35,7 @@ module.exports = function(server) {
             HelpEntry.create(body, function (err, entry) {
                 if (!err) {
                     status = 201;
-                    response = { 'ok': true, 'id': entry._id, 'deleteCode': entry.deleteCode };
+                    response = { 'ok': true, 'id': entry._id,  'entry_id': entry.entry_id, 'deleteCode': entry.deleteCode };
                 }
                 else {
                     status = 400;
