@@ -18,11 +18,19 @@ module.exports = function(server) {
             }
         }
 
-        HelpEntry.find(findQuery, function(err, entries) {
+        HelpEntry.find(findQuery, { deleteCode: 0}, function(err, entries) {
             if(err)
                 res.status(400).json({'ok' : false, 'error' : 'api_error_entry_get'});
-            else
+            else {
+                for(let k in entries){
+                    /* Remove fields */
+                    if(entries[k]['isAnonymously']) {
+                        entries[k]['name'] = undefined;
+                        entries[k]['phone'] = undefined;
+                    }
+                }
                 res.status(200).json({'ok' : true, entries});
+            }
         });
     });
 
