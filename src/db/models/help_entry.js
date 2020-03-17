@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../../config');
-const generateDeleteCode = require('../helpers');
+const helpers = require('../helpers');
 const mongoose = require('mongoose');
 
 const re = /\S+@\S+\.\S+/;
@@ -51,7 +51,7 @@ helpEntrySchema.pre('save', function(next) {
     let entry = this;
 
     if(entry.email && re.test(entry.email)) {
-        generateDeleteCode.then(code => {
+        helpers.generateDeleteCode().then(code => {
             entry.deleteCode = code;
             console.log('Created entry with delete code', code);
             next();

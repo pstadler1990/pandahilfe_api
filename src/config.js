@@ -7,7 +7,7 @@ const config = Object.freeze({
     },
     serverPort : 3010,
     db: {
-        url: 'mongodb://test:test@192.168.188.74:27017/pandahilfe?authSource=admin'
+        url: 'mongodb://panda:panda@192.168.188.74:27017/pandahilfe?authSource=pandahilfe'
     },
     allowHosts: [
         '192.168.188.72:3010'

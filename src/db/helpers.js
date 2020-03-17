@@ -7,4 +7,4 @@ const generateDeleteCode = function() {
     });
 };
 
-module.exports = generateDeleteCode;
+module.exports = {generateDeleteCode};
