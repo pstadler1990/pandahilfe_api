@@ -66,6 +66,23 @@ module.exports = function(server) {
                     'R-Oberisling - Graß',
                     'R-Burgweinting - Harting',
                 ];
+            } else if(body.location === 'Würzburg') {
+                body.location = [
+                    'Würzburg',
+                    'W-Altstadt',
+                    'W-Zellerau',
+                    'W-Dürrbachtal',
+                    'W-Grombühl',
+                    'W-Lindleinsmühle',
+                    'W-Frauenland',
+                    'W-Sanderau',
+                    'W-Heidingsfeld',
+                    'W-Heuchelhof',
+                    'W-Steinbachtal',
+                    'W-Versbach',
+                    'W-Lengfeld',
+                    'W-Rottenbauer',
+                ];
             }
 
             HelpEntry.create(body, function (err, entry) {
